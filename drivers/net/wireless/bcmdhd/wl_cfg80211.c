@@ -486,7 +486,7 @@ static s8 wl_dbg_estr[][WL_DBG_ESTR_MAX] = {
 	.hw_value		= (_channel),			\
 	.flags			= (_flags),			\
 	.max_antenna_gain	= 0,				\
-	.max_power		= 20,				\
+	.max_power		= 30,				\
 }
 
 #define CHAN5G(_channel, _flags) {				\
@@ -495,7 +495,7 @@ static s8 wl_dbg_estr[][WL_DBG_ESTR_MAX] = {
 	.hw_value		= (_channel),			\
 	.flags			= (_flags),			\
 	.max_antenna_gain	= 0,				\
-	.max_power		= 20,				\
+	.max_power		= 30,				\
 }
 
 #define RATE_TO_BASE100KBPS(rate)   (((rate) * 10) / 2)
@@ -6713,7 +6713,6 @@ wl_cfg80211_event(struct net_device *ndev, const wl_event_msg_t *e, void *data)
 	struct wl_priv *wl = wlcfg_drv_priv;
 	char *macaddr = (char *)&e->addr; //Broadcom 0405
 	u8 *curbssid; //Broadcom 0405
-	u32 reason = ntoh32(e->reason); //Broadcom 0529
 
 #if (WL_DBG_LEVEL > 0)
 	s8 *estr = (event_type <= sizeof(wl_dbg_estr) / WL_DBG_ESTR_MAX - 1) ?
@@ -6731,9 +6730,9 @@ wl_cfg80211_event(struct net_device *ndev, const wl_event_msg_t *e, void *data)
 
 	switch (event_type) {
 	case WLC_E_DEAUTH: //Broadcom 0405
-		printf("DEAUTH received, %02X:%02X:%02X:%02X:%02X:%02X!, reason:%d\n",
+		printf("DEAUTH received, %02X:%02X:%02X:%02X:%02X:%02X!\n",
 					macaddr[0], macaddr[1], macaddr[2], macaddr[3],
-					macaddr[4], macaddr[5], reason);
+					macaddr[4], macaddr[5]);
 		
 		curbssid = wl_read_prof(wl, ndev, WL_PROF_BSSID);
 		
@@ -6744,19 +6743,9 @@ wl_cfg80211_event(struct net_device *ndev, const wl_event_msg_t *e, void *data)
 		}
 		break;
 	case WLC_E_DEAUTH_IND: //Broadcom 0410
-		printf("DEAUTH_IND received, %02X:%02X:%02X:%02X:%02X:%02X!, reason:%d\n",
+		printf("DEAUTH_IND received, %02X:%02X:%02X:%02X:%02X:%02X!\n",
 					macaddr[0], macaddr[1], macaddr[2], macaddr[3],
-					macaddr[4], macaddr[5], reason);
-		break;
-	case WLC_E_DISASSOC: //Broadcom 0529
-		printf("DISASSOC received, %02X:%02X:%02X:%02X:%02X:%02X!, reason:%d\n",
-					macaddr[0], macaddr[1], macaddr[2], macaddr[3],
-					macaddr[4], macaddr[5], reason);
-		break;
-	case WLC_E_DISASSOC_IND: //Broadcom 0529
-		printf("DISASSOC_IND received, %02X:%02X:%02X:%02X:%02X:%02X!, reason:%d\n",
-					macaddr[0], macaddr[1], macaddr[2], macaddr[3],
-					macaddr[4], macaddr[5], reason);
+					macaddr[4], macaddr[5]);
 		break;
 	case WLC_E_ASSOCREQ_IE:
 		WL_DBG(("WLC_E_ASSOCREQ_IE\n"));

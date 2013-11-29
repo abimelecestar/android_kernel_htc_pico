@@ -44,6 +44,9 @@
 #include <linux/fs.h>
 /* HTC_CSP_START */
 #include <linux/ioprio.h>
+#ifdef CONFIG_PERFLOCK
+#include <mach/perflock.h>
+#endif
 /* HTC_CSP_END */
 
 #include <asm/uaccess.h>
@@ -428,7 +431,11 @@ uint dhd_intr = TRUE;
 module_param(dhd_intr, uint, 0);
 
 /* SDIO Drive Strength (in milliamps) */
+#if defined(CONFIG_MACH_VILLEC2)
+uint dhd_sdiod_drive_strength = 3;
+#else
 uint dhd_sdiod_drive_strength = 6;
+#endif
 module_param(dhd_sdiod_drive_strength, uint, 0);
 
 /* Tx/Rx bounds */
@@ -1863,16 +1870,17 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt, uint8 chan)
 #ifdef BRCM_WPSAP
 		/* check eap id  */
 		if (ntoh16(skb->protocol) == ETHER_TYPE_802_1X){
+#if 0
 			int plen = 0;
-			pr_debug("@@@ got eap packet start! \n");
+			printk("@@@ got eap packet start! \n");
 			for(plen = 0; plen<len ; plen++){
-				pr_debug("%02x ",eth[plen]);
+				printk("%02x ",eth[plen]);
 				if((plen + 1 )%8 == 0)
-					pr_debug("\n");
+					printk("\n");
 			}
-			pr_debug("\n");
-			pr_debug("@@@ got eap packet End! \n");
-
+			printk("\n");
+			printk("@@@ got eap packet End! \n");
+#endif
 			if(eth[22] == 0x01) {//22:shit to eap identity
 				//send wps start event
 				ASSERT(dhd->iflist[ifidx]->net != NULL);
@@ -3493,7 +3501,7 @@ dhd_preinit_ioctls(dhd_pub_t *dhd)
 	uint power_mode = PM_FAST;
 	uint32 dongle_align = DHD_SDALIGN;
 	uint32 glom = 0;
-	uint bcn_timeout = 4; //[Broadcom 0423]
+	uint bcn_timeout = 4;
 	uint retry_max = 10;
 #if defined(ARP_OFFLOAD_SUPPORT)
 	int arpoe = 0; /* Do not enable ARP offload feature since it has bug */
